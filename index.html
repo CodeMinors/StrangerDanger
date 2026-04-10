@@ -1,0 +1,1110 @@
+The file has 1106 lines. Let me create a downloadable version for you:
+Action: $ cat /app/chat-safety-trainer.html
+Observation: <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Safety Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chivo:wght@400;700;900&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #0A0A0A;
+            color: #FFFFFF;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Platform Selection Screen */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .platform-select {
+            min-height: 100vh;
+            padding: 48px 24px;
+            position: relative;
+        }
+
+        .bg-texture {
+            position: fixed;
+            inset: 0;
+            opacity: 0.05;
+            pointer-events: none;
+            background-image: url('https://static.prod-images.emergentagent.com/jobs/c34f8478-a8d7-442c-80bf-f5be7abf78e5/images/751e9cd0de08f3ca45446a17fa9e2e2548c0ac682b04992cbc717c0172e19626.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .header-section {
+            position: relative;
+            z-index: 10;
+            margin-bottom: 48px;
+        }
+
+        .header-title {
+            font-family: 'Chivo', sans-serif;
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            color: #A3A3A3;
+            line-height: 1.5;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .platform-card {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 32px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            text-align: left;
+        }
+
+        .platform-card:hover {
+            border-color: #007AFF;
+        }
+
+        .platform-card.gaming:hover {
+            border-color: #FF3B30;
+        }
+
+        .platform-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            transition: transform 0.2s;
+        }
+
+        .platform-card:hover .platform-icon {
+            transform: scale(1.1);
+        }
+
+        .platform-card h2 {
+            font-family: 'Chivo', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .platform-card p {
+            color: #A3A3A3;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Chat Screen */
+        .chat-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .chat-header {
+            background: #141414;
+            border-bottom: 1px solid #262626;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header h1 {
+            font-family: 'Chivo', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 14px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-block {
+            background: #1A1A1A;
+            border-color: #FF9500;
+            color: #FF9500;
+        }
+
+        .btn-block:hover:not(:disabled) {
+            background: #2E1A00;
+        }
+
+        .btn-report {
+            background: #1A1A1A;
+            border-color: #FF3B30;
+            color: #FF3B30;
+        }
+
+        .btn-report:hover:not(:disabled) {
+            background: #2E0000;
+        }
+
+        .btn-end {
+            background: #1A1A1A;
+            border-color: #262626;
+            color: #A3A3A3;
+        }
+
+        .btn-end:hover:not(:disabled) {
+            background: #262626;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #007AFF;
+            border-color: #007AFF;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0066CC;
+        }
+
+        .chat-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-messages-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #262626;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .message.user .message-bubble {
+            background: #007AFF;
+            color: white;
+        }
+
+        .message.assistant .message-bubble {
+            background: #262626;
+            color: white;
+        }
+
+        .chat-input-section {
+            border-top: 1px solid #262626;
+            padding: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #141414;
+            border: 1px solid #262626;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            resize: none;
+            min-height: 60px;
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: white;
+        }
+
+        .send-btn {
+            height: 60px;
+            width: 60px;
+            background: #007AFF;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #0066CC;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            width: 500px;
+            background: #0A0A0A;
+            overflow-y: auto;
+            border-left: 1px solid #262626;
+        }
+
+        .analysis-content {
+            padding: 24px;
+        }
+
+        .analysis-hidden {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+
+        .show-analysis-btn {
+            padding: 16px 32px;
+            font-size: 18px;
+            font-family: 'Chivo', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .analysis-card {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .analysis-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #A3A3A3;
+            margin-bottom: 12px;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .score-number {
+            font-family: 'Chivo', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+        }
+
+        .score-total {
+            font-size: 24px;
+            color: #A3A3A3;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #262626;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #34C759;
+            transition: width 0.3s;
+        }
+
+        .flags-section {
+            margin-bottom: 24px;
+        }
+
+        .flags-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .flags-title {
+            font-family: 'Chivo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .flag-item {
+            margin-bottom: 16px;
+        }
+
+        .flag-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .flag-description {
+            font-size: 14px;
+            color: #A3A3A3;
+        }
+
+        .red-flags {
+            border-color: #FF3B30;
+        }
+
+        .green-flags {
+            border-color: #34C759;
+        }
+
+        .suggestion-item {
+            background: #1A1A1A;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .result-card {
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 48px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .result-header h2 {
+            font-family: 'Chivo', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 16px;
+        }
+
+        .result-score {
+            margin-bottom: 24px;
+        }
+
+        .result-score-label {
+            font-size: 14px;
+            color: #A3A3A3;
+            margin-bottom: 8px;
+        }
+
+        .feedback-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .feedback-box.correct {
+            background: #1A2E1A;
+            border: 1px solid #34C759;
+        }
+
+        .feedback-box.incorrect {
+            background: #2E1A1A;
+            border: 1px solid #FF9500;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .feedback-title {
+            font-family: 'Chivo', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: #1A1A1A;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .info-title {
+            font-family: 'Chivo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .truth-box {
+            background: #2E1A1A;
+            border: 2px solid #FF9500;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .result-actions {
+            text-align: center;
+        }
+
+        .btn-large {
+            padding: 16px 32px;
+            font-size: 18px;
+            font-family: 'Chivo', sans-serif;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #141414;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 16px 24px;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .toast.show {
+            display: flex;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-color: #34C759;
+        }
+
+        .toast.error {
+            border-color: #FF3B30;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #141414;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #333;
+        }
+
+        /* Icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon-lg {
+            width: 24px;
+            height: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .analysis-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #262626;
+            }
+
+            .chat-main {
+                flex-direction: column;
+            }
+
+            .header-title {
+                font-size: 36px;
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toastIcon">✓</span>
+        <span id="toastMessage"></span>
+    </div>
+
+    <!-- Platform Selection Screen -->
+    <div id="platformScreen" class="screen active platform-select">
+        <div class="bg-texture"></div>
+        <div class="container">
+            <div class="header-section">
+                <h1 class="header-title">
+                    <svg class="icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                    Chat Safety Trainer
+                </h1>
+                <p class="header-subtitle">
+                    Practice safe chatting with AI simulation. Get real-time safety analysis and better response suggestions.
+                </p>
+            </div>
+
+            <div class="platform-grid">
+                <div class="platform-card" onclick="startChat('social_media')">
+                    <svg class="platform-icon" fill="#007AFF" viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path>
+                    </svg>
+                    <h2>Social Media</h2>
+                    <p>Practice chatting with strangers online. Learn to identify privacy risks and manipulation tactics.</p>
+                </div>
+
+                <div class="platform-card gaming" onclick="startChat('gaming')">
+                    <svg class="platform-icon" fill="#FF3B30" viewBox="0 0 24 24">
+                        <path d="M21.58 16.09l-1.09-7.66C20.21 6.46 18.52 5 16.53 5H7.47C5.48 5 3.79 6.46 3.51 8.43l-1.09 7.66C2.2 17.63 3.39 19 4.94 19c.68 0 1.32-.27 1.8-.75L9 16h6l2.25 2.25c.48.48 1.13.75 1.8.75 1.56 0 2.75-1.37 2.53-2.91zM11 11H9v2H8v-2H6v-1h2V8h1v2h2v1zm4-1c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm2 3c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"></path>
+                    </svg>
+                    <h2>Gaming Platform</h2>
+                    <p>Practice gaming chat conversations. Recognize toxic behavior and unsafe requests.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Screen -->
+    <div id="chatScreen" class="screen chat-screen">
+        <div class="chat-header">
+            <div class="chat-header-left">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                <h1 id="chatTitle">Chat Safety Trainer</h1>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-block" onclick="endChat('block')" id="blockBtn">
+                    <svg class="icon" style="display: inline; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                    Block User
+                </button>
+                <button class="btn btn-report" onclick="endChat('report')" id="reportBtn">
+                    <svg class="icon" style="display: inline; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"></path>
+                    </svg>
+                    Report User
+                </button>
+                <button class="btn btn-end" onclick="endChat('end')" id="endBtn">
+                    <svg class="icon" style="display: inline; margin-right: 4px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    End Chat
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-messages-section">
+                <div class="messages-container" id="messagesContainer"></div>
+                <div class="chat-input-section">
+                    <textarea 
+                        id="chatInput" 
+                        class="chat-input" 
+                        placeholder="Type your response..."
+                        onkeypress="handleKeyPress(event)"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="analysis-panel" id="analysisPanel">
+                <div id="analysisHidden" class="analysis-hidden">
+                    <button class="btn btn-primary show-analysis-btn" onclick="toggleAnalysis()">
+                        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        Show Safety Analysis
+                    </button>
+                </div>
+                <div id="analysisContent" class="analysis-content hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen -->
+    <div id="resultScreen" class="screen result-screen">
+        <div class="result-card">
+            <div class="result-header">
+                <h2>Chat Session Complete</h2>
+                <div class="result-score">
+                    <p class="result-score-label">Overall Safety Score</p>
+                    <div class="score-display">
+                        <span id="finalScore" class="score-number">0</span>
+                        <span class="score-total">/100</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="finalProgress" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedbackBox" class="feedback-box">
+                <div class="feedback-header">
+                    <svg id="feedbackIcon" class="icon-lg" fill="currentColor" viewBox="0 0 24 24"></svg>
+                    <h3 id="feedbackTitle" class="feedback-title"></h3>
+                </div>
+                <p id="feedbackExplanation"></p>
+            </div>
+
+            <div class="info-box">
+                <h4 class="info-title">What This Score Means:</h4>
+                <p id="scoreRecommendation"></p>
+            </div>
+
+            <div class="truth-box">
+                <div class="feedback-header">
+                    <svg class="icon-lg" fill="#FF9500" viewBox="0 0 24 24">
+                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path>
+                    </svg>
+                    <h4 class="info-title" style="margin: 0;">The Truth About This User</h4>
+                </div>
+                <p id="botTruth"></p>
+            </div>
+
+            <div class="result-actions">
+                <button class="btn btn-primary btn-large" onclick="resetToStart()">
+                    Try Another Scenario
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'https://platform-chat-audit.preview.emergentagent.com/api';
+        
+        // State
+        let state = {
+            currentScreen: 'platform',
+            sessionId: null,
+            platformType: null,
+            messages: [],
+            currentAnalysis: null,
+            showAnalysis: false
+        };
+
+        // Utility Functions
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMessage');
+            
+            toast.className = 'toast show ' + type;
+            icon.textContent = type === 'success' ? '✓' : '✗';
+            msg.textContent = message;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenName + 'Screen').classList.add('active');
+            state.currentScreen = screenName;
+        }
+
+        function getSafetyColor(score) {
+            if (score >= 70) return '#34C759';
+            if (score >= 40) return '#FF9500';
+            return '#FF3B30';
+        }
+
+        // API Functions
+        async function startChat(platformType) {
+            try {
+                const response = await fetch(`${API_URL}/start-chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform_type: platformType })
+                });
+
+                if (!response.ok) throw new Error('Failed to start chat');
+
+                const data = await response.json();
+                state.sessionId = data.session_id;
+                state.platformType = platformType;
+                state.messages = [{
+                    role: 'assistant',
+                    content: data.initial_message,
+                    timestamp: new Date().toISOString()
+                }];
+
+                document.getElementById('chatTitle').textContent = 
+                    platformType === 'social_media' ? 'Social Media Safety Trainer' : 'Gaming Safety Trainer';
+
+                renderMessages();
+                showScreen('chat');
+                showToast('Chat started! Practice safe chatting.');
+            } catch (error) {
+                console.error('Start chat error:', error);
+                showToast('Failed to start chat', 'error');
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) {
+                showToast('Please type a message', 'error');
+                return;
+            }
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            input.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/send-message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: state.sessionId,
+                        message: message
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to send message');
+
+                const data = await response.json();
+                
+                state.messages.push(data.message);
+                state.messages.push(data.bot_response);
+                state.currentAnalysis = data.analysis;
+                state.showAnalysis = false;
+
+                input.value = '';
+                renderMessages();
+                hideAnalysis();
+
+            } catch (error) {
+                console.error('Send message error:', error);
+                showToast('Failed to send message', 'error');
+            } finally {
+                sendBtn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        async function endChat(action) {
+            const buttons = ['blockBtn', 'reportBtn', 'endBtn'];
+            buttons.forEach(id => document.getElementById(id).disabled = true);
+
+            try {
+                const response = await fetch(`${API_URL}/end-chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: state.sessionId,
+                        action: action
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to end chat');
+
+                const data = await response.json();
+                renderResult(data);
+                showScreen('result');
+
+            } catch (error) {
+                console.error('End chat error:', error);
+                showToast('Failed to end chat', 'error');
+                buttons.forEach(id => document.getElementById(id).disabled = false);
+            }
+        }
+
+        // Render Functions
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            container.innerHTML = state.messages.map(msg => `
+                <div class="message ${msg.role}">
+                    <div class="message-bubble">${escapeHtml(msg.content)}</div>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderAnalysis() {
+            const content = document.getElementById('analysisContent');
+            const analysis = state.currentAnalysis;
+
+            if (!analysis) {
+                content.innerHTML = '<p style="color: #A3A3A3; text-align: center;">Send a message to see safety analysis</p>';
+                return;
+            }
+
+            const scoreColor = getSafetyColor(analysis.score);
+
+            let html = `
+                <div class="analysis-card">
+                    <p class="analysis-label">Safety Score</p>
+                    <div class="score-display">
+                        <span class="score-number" style="color: ${scoreColor}">${analysis.score}</span>
+                        <span class="score-total">/100</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${analysis.score}%; background: ${scoreColor}"></div>
+                    </div>
+                </div>
+            `;
+
+            if (analysis.red_flags && analysis.red_flags.length > 0) {
+                html += `
+                    <div class="analysis-card red-flags">
+                        <div class="flags-header">
+                            <svg class="icon" fill="#FF3B30" viewBox="0 0 24 24">
+                                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path>
+                            </svg>
+                            <h3 class="flags-title">Danger Signs</h3>
+                        </div>
+                        <div class="flags-section">
+                            ${analysis.red_flags.map(flag => `
+                                <div class="flag-item">
+                                    <p class="flag-title">${escapeHtml(flag.title)}</p>
+                                    <p class="flag-description">${escapeHtml(flag.description)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (analysis.green_flags && analysis.green_flags.length > 0) {
+                html += `
+                    <div class="analysis-card green-flags">
+                        <div class="flags-header">
+                            <svg class="icon" fill="#34C759" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
+                            </svg>
+                            <h3 class="flags-title">Safe Aspects</h3>
+                        </div>
+                        <div class="flags-section">
+                            ${analysis.green_flags.map(flag => `
+                                <div class="flag-item">
+                                    <p class="flag-title">${escapeHtml(flag.title)}</p>
+                                    <p class="flag-description">${escapeHtml(flag.description)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (analysis.alternative_suggestions && analysis.alternative_suggestions.length > 0) {
+                html += `
+                    <div class="analysis-card">
+                        <h3 class="flags-title">Better Response Ideas</h3>
+                        <div style="margin-top: 16px;">
+                            ${analysis.alternative_suggestions.map(suggestion => `
+                                <div class="suggestion-item">${escapeHtml(suggestion)}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `
+                <button class="btn btn-primary" style="width: 100%;" onclick="toggleAnalysis()">
+                    Hide Analysis
+                </button>
+            `;
+
+            content.innerHTML = html;
+        }
+
+        function renderResult(data) {
+            const scoreColor = getSafetyColor(data.final_score);
+
+            document.getElementById('finalScore').textContent = data.final_score;
+            document.getElementById('finalScore').style.color = scoreColor;
+            document.getElementById('finalProgress').style.width = data.final_score + '%';
+            document.getElementById('finalProgress').style.background = scoreColor;
+
+            const feedbackBox = document.getElementById('feedbackBox');
+            feedbackBox.className = 'feedback-box ' + (data.was_correct_action ? 'correct' : 'incorrect');
+
+            const feedbackIcon = document.getElementById('feedbackIcon');
+            if (data.was_correct_action) {
+                feedbackIcon.innerHTML = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>';
+                feedbackIcon.style.fill = '#34C759';
+            } else {
+                feedbackIcon.innerHTML = '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path>';
+                feedbackIcon.style.fill = '#FF9500';
+            }
+
+            document.getElementById('feedbackTitle').textContent = data.decision_feedback;
+            document.getElementById('feedbackExplanation').textContent = data.explanation;
+            document.getElementById('scoreRecommendation').textContent = data.safety_recommendation;
+            document.getElementById('botTruth').textContent = data.bot_truth;
+        }
+
+        function toggleAnalysis() {
+            state.showAnalysis = !state.showAnalysis;
+
+            if (state.showAnalysis) {
+                document.getElementById('analysisHidden').classList.add('hidden');
+                document.getElementById('analysisContent').classList.remove('hidden');
+                renderAnalysis();
+            } else {
+                hideAnalysis();
+            }
+        }
+
+        function hideAnalysis() {
+            document.getElementById('analysisHidden').classList.remove('hidden');
+            document.getElementById('analysisContent').classList.add('hidden');
+        }
+
+        function resetToStart() {
+            state = {
+                currentScreen: 'platform',
+                sessionId: null,
+                platformType: null,
+                messages: [],
+                currentAnalysis: null,
+                showAnalysis: false
+            };
+            document.getElementById('chatInput').value = '';
+            showScreen('platform');
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initialize
+        hideAnalysis();
+    </script>
+</body>
+</html>
+Exit code: 0
