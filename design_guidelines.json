@@ -1,0 +1,141 @@
+{
+  "project_name": "Chat Safety Trainer",
+  "theme": "dark",
+  "archetype": "Archetype 2: Performance Pro (Tactical Command Center Variant)",
+  "vibe": "Cybersecurity, Tactical, Analytical, High-Contrast, Professional Training",
+  "colors": {
+    "global": {
+      "background": "#06070A",
+      "surface": "#101218",
+      "surface_elevated": "#181A22",
+      "border": "#222631",
+      "border_focus": "#00E5FF",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#8B949E",
+      "text_muted": "#5B6471"
+    },
+    "semantic": {
+      "primary": "#00E5FF",
+      "primary_foreground": "#000000",
+      "red_flag": "#FF2A55",
+      "red_flag_bg": "rgba(255, 42, 85, 0.1)",
+      "green_flag": "#00FF66",
+      "green_flag_bg": "rgba(0, 255, 102, 0.1)",
+      "warning": "#FFB000",
+      "warning_bg": "rgba(255, 176, 0, 0.1)"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Azeret Mono",
+      "body": "IBM Plex Sans"
+    },
+    "hierarchy": {
+      "h1_hero": "text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase",
+      "h2_section": "text-2xl sm:text-3xl font-bold tracking-tight",
+      "h3_widget": "text-sm sm:text-base font-bold tracking-[0.2em] uppercase text-text_secondary",
+      "body_large": "text-lg leading-relaxed",
+      "body_base": "text-base leading-relaxed",
+      "body_small": "text-sm leading-normal",
+      "label": "text-xs font-bold tracking-widest uppercase"
+    },
+    "rules": [
+      "No Inter or generic sans for headings.",
+      "Headings must use tight letter spacing.",
+      "Labels/Overlines must be uppercase, tiny, with wide spacing (tracking-[0.2em]).",
+      "Do not use gray text on gray backgrounds."
+    ]
+  },
+  "layout_and_spacing": {
+    "spacing_scale": "Use generous spacing. p-6, p-8, p-12 for containers.",
+    "grid_modes": {
+      "platform_selection": {
+        "description": "Bento 'Tetris' Grid for high visual impact.",
+        "classes": "grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8",
+        "spans": {
+          "hero_card": "col-span-1 md:col-span-12 lg:col-span-8",
+          "secondary_card": "col-span-1 md:col-span-12 lg:col-span-4"
+        }
+      },
+      "chat_dashboard": {
+        "description": "Control Room Grid for dense data and chat.",
+        "classes": "grid grid-cols-1 lg:grid-cols-12 gap-4 h-[calc(100vh-6rem)]",
+        "spans": {
+          "chat_pane": "col-span-1 lg:col-span-7 h-full",
+          "analysis_pane": "col-span-1 lg:col-span-5 h-full flex flex-col gap-4"
+        }
+      }
+    }
+  },
+  "surfaces_and_effects": {
+    "panels": {
+      "style": "Grid Borders / Technical Look",
+      "classes": "bg-surface border border-border rounded-none",
+      "hover": "hover:border-border_focus transition-colors duration-300"
+    },
+    "glass": {
+      "style": "Optical Clarity Glass (For Modals/Sticky Headers)",
+      "classes": "bg-[#06070A]/80 backdrop-blur-xl border-b border-white/10"
+    },
+    "glows": {
+      "red_flag": "drop-shadow-[0_0_8px_rgba(255,42,85,0.4)]",
+      "green_flag": "drop-shadow-[0_0_8px_rgba(0,255,102,0.4)]"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-black font-bold uppercase tracking-widest px-6 py-3 rounded-none hover:bg-white transition-colors",
+      "destructive": "bg-transparent border border-red_flag text-red_flag hover:bg-red_flag hover:text-white transition-colors rounded-none px-6 py-3 font-bold uppercase tracking-widest",
+      "ghost": "text-text_secondary hover:text-white hover:bg-surface_elevated transition-colors px-4 py-2 uppercase tracking-wider text-xs font-bold"
+    },
+    "chat_bubbles": {
+      "user": "bg-surface_elevated border border-border text-white px-4 py-3 rounded-none self-end max-w-[80%]",
+      "bot": "bg-transparent border-l-2 border-primary pl-4 py-2 text-text_secondary self-start max-w-[80%]"
+    },
+    "analysis_widgets": {
+      "score_circle": "Use Recharts or SVG to create a radial progress bar. Stroke color depends on score (Red/Amber/Green). Track is dark gray.",
+      "flag_item": "flex items-start gap-3 p-4 border border-border bg-surface",
+      "flag_icon_red": "text-red_flag mt-1 flex-shrink-0",
+      "flag_icon_green": "text-green_flag mt-1 flex-shrink-0"
+    },
+    "inputs": {
+      "chat_input": "bg-surface border border-border text-white rounded-none px-4 py-3 w-full focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-all"
+    }
+  },
+  "animations": {
+    "live_analysis": "animate-pulse on the 'analyzing...' indicator.",
+    "typing_indicator": "Three dots bouncing sequentially.",
+    "score_reveal": "Number counting up smoothly (framer-motion or react-spring)."
+  },
+  "media": {
+    "images": {
+      "platform_background": {
+        "url": "https://images.unsplash.com/photo-1775057154553-0f3e8902fea3?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1Mjh8MHwxfHNlYXJjaHwyfHxkYXJrJTIwYWJzdHJhY3QlMjBkaWdpdGFsJTIwbmV0d29ya3xlbnwwfHx8fDE3NzU5NTk3NTN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract geometric lines and shapes on black background. Use as a low-opacity texture behind the platform selection screen.",
+        "usage": "bg-[url('...')] bg-cover bg-center opacity-20"
+      },
+      "stranger_avatar": {
+        "url": "https://images.unsplash.com/photo-1534294668821-28a3054f4256?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxoYWNrZXIlMjBzaWxob3VldHRlJTIwYW5vbnltb3VzfGVufDB8fHx8MTc3NTk1OTc2NXww&ixlib=rb-4.1.0&q=85",
+        "description": "Person wearing hoodie in shadows. Use as the avatar for the AI stranger in the chat.",
+        "usage": "Use in an Avatar component with a square, hard-edged frame (rounded-none), grayscale with red hover effect."
+      }
+    },
+    "icons": {
+      "library_preference": "lucide-react",
+      "suggestions": {
+        "shield": "ShieldAlert, ShieldCheck",
+        "chat": "MessageSquareTerminal",
+        "gaming": "Gamepad2",
+        "social": "Hash, MessageCircle",
+        "actions": "Ban (Block), Flag (Report), Power (End)"
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "INSTALL FONTS: Import 'Azeret Mono' and 'IBM Plex Sans' from Google Fonts in index.html or global CSS.",
+    "STRICT COMPONENT RULES: Do NOT use rounded corners (rounded-md/lg/xl). This design uses sharp edges (rounded-none) for a technical/tactical feel.",
+    "COLOR APPLICATION: Do not use default Tailwind colors (blue-500, red-500). Use the exact semantic HEX codes provided in this JSON.",
+    "LAYOUT ENFORCEMENT: The Chat screen must be a strict height (h-screen minus header), so the chat pane scrolls internally and the analysis pane remains fixed on the right.",
+    "TESTING: Add data-testid attributes to all buttons, input fields, and major layout sections."
+  ]
+}
