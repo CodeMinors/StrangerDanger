@@ -218,17 +218,19 @@ async def send_message(req: SendMessageRequest):
     if session["status"] != "active":
         raise HTTPException(400, "Session is no longer active")
     
-    # Get stranger response
+    # Get stranger response - include conversation history in prompt
     stranger_chat = get_stranger_chat(req.session_id, session["platform_type"])
     
-    # Rebuild conversation context for the stranger
+    # Build conversation context for the stranger
+    conversation_context = "Here is the conversation so far:\n"
     for msg in session["messages"]:
         if msg["role"] == "user":
-            stranger_chat._messages.append({"role": "user", "content": msg["content"]})
+            conversation_context += f"Them (the young person): {msg['content']}\n"
         else:
-            stranger_chat._messages.append({"role": "assistant", "content": msg["content"]})
+            conversation_context += f"You (the stranger): {msg['content']}\n"
+    conversation_context += f"\nThey just said: \"{req.message}\"\n\nRespond as the stranger. Stay in character. Keep it to 1-3 sentences."
     
-    bot_reply = await stranger_chat.send_message(UserMessage(text=req.message))
+    bot_reply = await stranger_chat.send_message(UserMessage(text=conversation_context))
     
     now = datetime.now(timezone.utc).isoformat()
     

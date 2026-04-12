@@ -194,6 +194,116 @@ class ChatSafetyTester:
         
         return False
 
+    def test_end_chat_report(self):
+        """Test ending chat with report action"""
+        # Start a new session for this test
+        success, response = self.run_test(
+            "Start Chat for Report Test",
+            "POST",
+            "start-chat",
+            200,
+            data={"platform_type": "gaming"},
+            timeout=10
+        )
+        
+        if not success or 'session_id' not in response:
+            print("❌ Failed to start session for report test")
+            return False
+        
+        report_session_id = response['session_id']
+        
+        # Send a message first
+        success, _ = self.run_test(
+            "Send Message for Report Test",
+            "POST",
+            "send-message",
+            200,
+            data={
+                "session_id": report_session_id,
+                "message": "Sure, I can share my real name and address!"
+            },
+            timeout=15
+        )
+        
+        if not success:
+            print("❌ Failed to send message for report test")
+            return False
+        
+        # Now test report action
+        success, response = self.run_test(
+            "End Chat - Report",
+            "POST",
+            "end-chat",
+            200,
+            data={
+                "session_id": report_session_id,
+                "action": "report"
+            },
+            timeout=15
+        )
+        
+        if success:
+            print(f"   Final Score: {response.get('final_score', 'N/A')}")
+            print(f"   Correct Action: {response.get('was_correct_action', 'N/A')}")
+            return True
+        
+        return False
+
+    def test_end_chat_end_action(self):
+        """Test ending chat with end action"""
+        # Start a new session for this test
+        success, response = self.run_test(
+            "Start Chat for End Test",
+            "POST",
+            "start-chat",
+            200,
+            data={"platform_type": "social_media"},
+            timeout=10
+        )
+        
+        if not success or 'session_id' not in response:
+            print("❌ Failed to start session for end test")
+            return False
+        
+        end_session_id = response['session_id']
+        
+        # Send a message first
+        success, _ = self.run_test(
+            "Send Message for End Test",
+            "POST",
+            "send-message",
+            200,
+            data={
+                "session_id": end_session_id,
+                "message": "I prefer not to share personal information online."
+            },
+            timeout=15
+        )
+        
+        if not success:
+            print("❌ Failed to send message for end test")
+            return False
+        
+        # Now test end action
+        success, response = self.run_test(
+            "End Chat - End",
+            "POST",
+            "end-chat",
+            200,
+            data={
+                "session_id": end_session_id,
+                "action": "end"
+            },
+            timeout=15
+        )
+        
+        if success:
+            print(f"   Final Score: {response.get('final_score', 'N/A')}")
+            print(f"   Correct Action: {response.get('was_correct_action', 'N/A')}")
+            return True
+        
+        return False
+
     def test_end_chat_invalid_session(self):
         """Test ending chat with invalid session"""
         success, _ = self.run_test(
@@ -223,6 +333,8 @@ def main():
         tester.test_send_message,
         tester.test_send_message_invalid_session,
         tester.test_end_chat_block,
+        tester.test_end_chat_report,
+        tester.test_end_chat_end_action,
         tester.test_end_chat_invalid_session,
     ]
     
