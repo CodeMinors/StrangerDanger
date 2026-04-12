@@ -1,4 +1,5 @@
 from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -355,6 +356,12 @@ Respond with JSON only."""
 
 # Include router
 app.include_router(api_router)
+
+# Serve the mobile app at root
+@app.get("/", response_class=HTMLResponse)
+async def serve_app():
+    html_path = Path(__file__).parent / "mobile.html"
+    return HTMLResponse(content=html_path.read_text(), status_code=200)
 
 app.add_middleware(
     CORSMiddleware,
