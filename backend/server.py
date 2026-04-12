@@ -178,6 +178,17 @@ def parse_json_response(text: str) -> dict:
 async def root():
     return {"message": "Chat Safety Trainer API"}
 
+@api_router.get("/health")
+async def health():
+    """Debug endpoint to check env vars and connectivity."""
+    has_key = bool(EMERGENT_LLM_KEY and len(EMERGENT_LLM_KEY) > 5)
+    try:
+        await db.command("ping")
+        db_ok = True
+    except Exception as e:
+        db_ok = str(e)
+    return {"llm_key_set": has_key, "key_prefix": EMERGENT_LLM_KEY[:12] + "..." if has_key else "MISSING", "db_connected": db_ok}
+
 @api_router.post("/start-chat", response_model=StartChatResponse)
 async def start_chat(req: StartChatRequest):
     if req.platform_type not in ("social_media", "gaming"):
@@ -185,29 +196,33 @@ async def start_chat(req: StartChatRequest):
     
     session_id = str(uuid.uuid4())
     
-    # Generate initial stranger message
-    stranger_chat = get_stranger_chat(session_id, req.platform_type)
+    try:
+        # Generate initial stranger message
+        stranger_chat = get_stranger_chat(session_id, req.platform_type)
     
-    if req.platform_type == "social_media":
-        prompt = "Start a conversation. You just found this person's profile and are reaching out for the first time. Say something casual and friendly."
-    else:
-        prompt = "Start a conversation. You just finished a game together and want to chat. Say something casual about the game."
-    
-    initial_message = await stranger_chat.send_message(UserMessage(text=prompt))
-    
-    # Store session in MongoDB
-    session_doc = {
-        "id": session_id,
-        "platform_type": req.platform_type,
-        "messages": [
-            {"role": "assistant", "content": initial_message, "timestamp": datetime.now(timezone.utc).isoformat()}
-        ],
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "status": "active"
-    }
-    await db.chat_sessions.insert_one(session_doc)
-    
-    return StartChatResponse(session_id=session_id, initial_message=initial_message)
+        if req.platform_type == "social_media":
+            prompt = "Start a conversation. You just found this person's profile and are reaching out for the first time. Say something casual and friendly."
+        else:
+            prompt = "Start a conversation. You just finished a game together and want to chat. Say something casual about the game."
+        
+        initial_message = await stranger_chat.send_message(UserMessage(text=prompt))
+        
+        # Store session in MongoDB
+        session_doc = {
+            "id": session_id,
+            "platform_type": req.platform_type,
+            "messages": [
+                {"role": "assistant", "content": initial_message, "timestamp": datetime.now(timezone.utc).isoformat()}
+            ],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "active"
+        }
+        await db.chat_sessions.insert_one(session_doc)
+        
+        return StartChatResponse(session_id=session_id, initial_message=initial_message)
+    except Exception as e:
+        logger.error(f"start-chat error: {type(e).__name__}: {e}")
+        raise HTTPException(500, f"Error: {type(e).__name__}: {str(e)}")
 
 @api_router.post("/send-message", response_model=SendMessageResponse)
 async def send_message(req: SendMessageRequest):
